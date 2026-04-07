@@ -1,6 +1,6 @@
 #pragma once
 #include <string>
-#include <nlohmann/json.hpp>
+#include "../external/nlohmann/json.hpp"
 #include "network.hpp"
 
 class GitHub {

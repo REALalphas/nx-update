@@ -25,7 +25,6 @@ jobs:
             switch-curl \
             switch-zlib \
             switch-libarchive \
-            switch-nlohmann-json \
             switch-mbedtls
 
       - name: Build
