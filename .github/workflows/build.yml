@@ -1,0 +1,42 @@
+name: Build
+
+on:
+  push:
+    branches: [ master, main ]
+  pull_request:
+    branches: [ master, main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: devkitpro/devkita64:latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Install dependencies
+        run: |
+          dkp-pacman -Syyu --noconfirm
+          dkp-pacman -S --noconfirm \
+            switch-glfw \
+            switch-mesa \
+            switch-glm \
+            switch-curl \
+            switch-zlib \
+            switch-libarchive \
+            switch-nlohmann-json \
+            switch-mbedtls
+
+      - name: Build
+        run: |
+          mkdir build
+          cd build
+          cmake .. -DBUILD_SWITCH=ON
+          make -j$(nproc)
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: nx-updater
+          path: build/*.nro
