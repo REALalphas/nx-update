@@ -32,7 +32,8 @@ FetchContent_MakeAvailable(json)
 set(BOREALIS_LIBRARY ${CMAKE_CURRENT_SOURCE_DIR}/external/borealis/library)
 set(BOREALIS_PATH ${BOREALIS_LIBRARY})
 
-# Disable SDL DBUS
+# Borealis variables to prevent errors
+set(BRLS_UNITY_BUILD OFF CACHE BOOL "Disable unity build")
 set(SDL_DBUS OFF CACHE BOOL "Disable SDL DBUS")
 
 # Add Borealis library
