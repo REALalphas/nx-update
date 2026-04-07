@@ -36,6 +36,12 @@ set(BOREALIS_PATH ${BOREALIS_LIBRARY})
 set(BRLS_UNITY_BUILD OFF CACHE BOOL "Disable unity build")
 set(SDL_DBUS OFF CACHE BOOL "Disable SDL DBUS")
 
+# Mock DBus variables to prevent NOTFOUND errors in devkitPro container
+set(DBUS_INCLUDE_DIRS "" CACHE STRING "" FORCE)
+set(DBUS_LIBRARIES "" CACHE STRING "" FORCE)
+set(DBUS_INCLUDE_DIR "" CACHE STRING "" FORCE)
+set(DBUS_ARCH_INCLUDE_DIR "" CACHE STRING "" FORCE)
+
 # Add Borealis library
 add_subdirectory(external/borealis/library)
 
