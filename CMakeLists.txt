@@ -29,8 +29,13 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(json)
 
 # Borealis integration
-# We need to set BOREALIS_PATH for its internal build system
-set(BOREALIS_PATH ${CMAKE_CURRENT_SOURCE_DIR}/external/borealis/library)
+set(BOREALIS_LIBRARY ${CMAKE_CURRENT_SOURCE_DIR}/external/borealis/library)
+set(BOREALIS_PATH ${BOREALIS_LIBRARY})
+
+# Disable SDL DBUS
+set(SDL_DBUS OFF CACHE BOOL "Disable SDL DBUS")
+
+# Add Borealis library
 add_subdirectory(external/borealis/library)
 
 include_directories(include)

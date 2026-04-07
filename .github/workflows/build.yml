@@ -27,6 +27,11 @@ jobs:
             switch-libarchive \
             switch-mbedtls
 
+      - name: Fix Submodules
+        run: |
+          cd external/borealis
+          git submodule update --init --recursive
+
       - name: Build
         run: |
           mkdir build
