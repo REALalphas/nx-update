@@ -15,8 +15,13 @@ if(BUILD_SWITCH)
     include(${DEVKITPRO}/cmake/Switch.cmake)
 endif()
 
-# JSON
-include_directories(external/json/include)
+# JSON using FetchContent to do it "right" without local files or submodules
+include(FetchContent)
+FetchContent_Declare(
+    json
+    URL https://github.com/nlohmann/json/releases/download/v3.11.3/json.tar.xz
+)
+FetchContent_MakeAvailable(json)
 
 # Borealis
 add_subdirectory(external/borealis)
@@ -28,6 +33,7 @@ if(BUILD_SWITCH)
     add_executable(nx-updater.elf ${SOURCE_FILES})
     target_link_libraries(nx-updater.elf
         borealis
+        nlohmann_json::nlohmann_json
         nx
         curl
         mbedtls
@@ -47,5 +53,5 @@ if(BUILD_SWITCH)
     endif()
 else()
     add_executable(nx-updater ${SOURCE_FILES})
-    target_link_libraries(nx-updater borealis)
+    target_link_libraries(nx-updater borealis nlohmann_json::nlohmann_json)
 endif()

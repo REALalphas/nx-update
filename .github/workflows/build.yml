@@ -31,7 +31,7 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake .. -DBUILD_SWITCH=ON
+          cmake .. -DBUILD_SWITCH=ON -DBUILD_JSON=ON
           make -j$(nproc)
 
       - name: Upload artifact
