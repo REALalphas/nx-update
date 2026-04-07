@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.14)
 project(nx-updater)
 
-# Set policy CMP0135 for FetchContent
 if(POLICY CMP0135)
   cmake_policy(SET CMP0135 NEW)
 endif()
@@ -10,7 +9,7 @@ if(NOT DEFINED PLATFORM_SWITCH)
     set(PLATFORM_SWITCH OFF)
 endif()
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 if(PLATFORM_SWITCH)
@@ -20,7 +19,7 @@ if(PLATFORM_SWITCH)
     include(${DEVKITPRO}/cmake/Switch.cmake)
 endif()
 
-# JSON using FetchContent
+# JSON
 include(FetchContent)
 FetchContent_Declare(
     json
@@ -29,9 +28,10 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(json)
 
-# Borealis
-# Pass PLATFORM_SWITCH to Borealis
-add_subdirectory(external/borealis)
+# Borealis integration
+# We need to set BOREALIS_PATH for its internal build system
+set(BOREALIS_PATH ${CMAKE_CURRENT_SOURCE_DIR}/external/borealis/library)
+add_subdirectory(external/borealis/library)
 
 include_directories(include)
 file(GLOB_RECURSE SOURCE_FILES source/*.cpp)
