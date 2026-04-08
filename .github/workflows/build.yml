@@ -1,0 +1,38 @@
+name: Build nx-update NRO
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: devkitpro/devkita64:latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up dependencies
+      run: |
+        dkp-pacman -Syu --noconfirm
+        dkp-pacman -S --noconfirm switch-cmake switch-pkg-config switch-glad switch-glm switch-mbedtls switch-curl switch-bzip2 switch-libpng switch-libjpeg-turbo switch-libwebp switch-zlib switch-freetype switch-sdl2 switch-sdl2_ttf switch-sdl2_image switch-sdl2_gfx switch-sdl2_mixer switch-mesa switch-libopus switch-libvorbis switch-libogg
+
+    - name: Configure CMake
+      run: |
+        . /etc/profile.d/devkit-env.sh
+        # switch-cmake sets up the toolchain automatically
+        aarch64-none-elf-cmake -B build -S . -DCMAKE_TOOLCHAIN_FILE=/opt/devkitpro/cmake/Switch.cmake -DCMAKE_BUILD_TYPE=Release
+
+    - name: Build
+      run: |
+        . /etc/profile.d/devkit-env.sh
+        cmake --build build -j$(nproc)
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: nx-update
+        path: build/nx-update.nro
