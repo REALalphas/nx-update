@@ -15,9 +15,6 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif()
 
-# We need libnx tools
-find_package(libnx REQUIRED)
-
 # Download Borealis (XITRIX fork)
 include(FetchContent)
 FetchContent_Declare(
@@ -31,27 +28,26 @@ FetchContent_MakeAvailable(borealis)
 file(GLOB_RECURSE SOURCES "src/*.cpp" "src/*.c")
 file(GLOB_RECURSE HEADERS "include/*.hpp" "include/*.h")
 
-# Need at least one source file to define the target
-if(NOT SOURCES)
-    file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/dummy.cpp" "int dummy() { return 0; }")
-    list(APPEND SOURCES "${CMAKE_CURRENT_BINARY_DIR}/dummy.cpp")
-endif()
-
 add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 
 target_include_directories(${PROJECT_NAME} PRIVATE include)
 
-# Link Borealis (this brings in libnx, glad, glfw etc. depending on platform)
+# Link Borealis
 target_link_libraries(${PROJECT_NAME} PRIVATE borealis::borealis)
 
-# Add RomFS if the directory exists
-if(EXISTS "${CMAKE_SOURCE_DIR}/romfs")
-    nx_add_romfs(${PROJECT_NAME} "${CMAKE_SOURCE_DIR}/romfs")
-endif()
+# Generate NRO manually using elf2nro and nacptool
+add_custom_command(
+    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.nacp
+    COMMAND nacptool --create "${APP_TITLE}" "${APP_AUTHOR}" "${APP_VERSION}" ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.nacp
+)
 
-# Generate the .nro
-nx_generate_nro(${PROJECT_NAME}
-    NAME ${APP_TITLE}
-    AUTHOR ${APP_AUTHOR}
-    VERSION ${APP_VERSION}
+add_custom_command(
+    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.nro
+    COMMAND elf2nro $<TARGET_FILE:${PROJECT_NAME}> ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.nro --nacp=${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.nacp --romfsdir=${CMAKE_SOURCE_DIR}/romfs
+    DEPENDS ${PROJECT_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.nacp
+)
+
+add_custom_target(
+    nro ALL
+    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.nro
 )

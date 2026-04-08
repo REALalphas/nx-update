@@ -1,7 +1,5 @@
 #include "UpdateManager.hpp"
 #include <iostream>
-#include <thread>
-#include <chrono>
 
 UpdateManager& UpdateManager::getInstance() {
     static UpdateManager instance;
@@ -10,7 +8,7 @@ UpdateManager& UpdateManager::getInstance() {
 
 ReleaseInfo UpdateManager::checkLatestRelease(const std::string& repo) {
     std::cout << "Checking for updates in repository: " << repo << std::endl;
-    std::this_thread::sleep_for(std::chrono::seconds(1)); // Simulate network request
+    // Removed sleep_for to avoid freezing main thread in this mock
 
     ReleaseInfo info;
     info.version = "v1.0.1";
@@ -21,7 +19,6 @@ ReleaseInfo UpdateManager::checkLatestRelease(const std::string& repo) {
 
 bool UpdateManager::downloadRelease(const std::string& url) {
     std::cout << "Downloading from: " << url << std::endl;
-    std::this_thread::sleep_for(std::chrono::seconds(2)); // Simulate download
     return true;
 }
 
@@ -35,10 +32,7 @@ void UpdateManager::extractAndApplyUpdate(const std::string& zipPath) {
     std::cout << "Cleaning directories..." << std::endl;
     cleanDirectory("/atmosphere/", ignoreList);
 
-    // Mocking extraction
     std::cout << "Extracting new files..." << std::endl;
-    std::this_thread::sleep_for(std::chrono::seconds(2));
-
     std::cout << "Update finished!" << std::endl;
 }
 

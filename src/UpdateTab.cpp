@@ -1,10 +1,12 @@
+#include <chrono>
 #include "UpdateTab.hpp"
 #include "ConfigManager.hpp"
 #include "UpdateManager.hpp"
 #include <iostream>
+#include <thread>
 
 UpdateTab::UpdateTab() {
-    this->setAxis(brls::Axis::COLUMN);
+    this->setFlexDirection(brls::FlexDirection::COLUMN);
     this->setAlignItems(brls::AlignItems::CENTER);
     this->setJustifyContent(brls::JustifyContent::CENTER);
 
@@ -13,17 +15,33 @@ UpdateTab::UpdateTab() {
     statusLabel->setMargins(0, 0, 20, 0);
     this->addView(statusLabel);
 
-    checkButton = new brls::Button();
-    checkButton->setStyle(brls::ButtonStyle::PRIMARY);
-    checkButton->setTitle("Check for Updates");
-    checkButton->getClickEvent()->subscribe([this](brls::View* view) {
-        onCheckUpdates();
+    actionButton = new brls::Button(brls::ButtonStyle::PRIMARY);
+    actionButton->setTitle("Check for Updates");
+
+    actionButton->getClickEvent()->subscribe([this](brls::View* view) {
+        updateButtonAction();
     });
-    this->addView(checkButton);
+    this->addView(actionButton);
 }
 
 brls::View* UpdateTab::create() {
     return new UpdateTab();
+}
+
+void UpdateTab::updateButtonAction() {
+    switch (currentState) {
+        case State::Idle:
+            onCheckUpdates();
+            break;
+        case State::UpdateAvailable:
+            showCountdown();
+            break;
+        case State::Finished:
+            brls::Application::quit();
+            break;
+        default:
+            break;
+    }
 }
 
 void UpdateTab::onCheckUpdates() {
@@ -33,39 +51,56 @@ void UpdateTab::onCheckUpdates() {
     currentRelease = UpdateManager::getInstance().checkLatestRelease(repo);
 
     statusLabel->setText("Update available: " + currentRelease.version + "\n" + currentRelease.changelog);
+    actionButton->setTitle("Install Update");
 
-    checkButton->setTitle("Install Update");
-    checkButton->getClickEvent()->unsubscribeAll();
-    checkButton->getClickEvent()->subscribe([this](brls::View* view) {
-        showCountdown();
-    });
+    currentState = State::UpdateAvailable;
 }
 
 void UpdateTab::showCountdown() {
-    countdownTimer = 5;
-    checkButton->setState(brls::ViewState::DISABLED);
+    currentState = State::Countdown;
+    actionButton->setInteractable(false);
+    countdownValue = 5;
 
-    // Instead of using brls::Timer which might be tricky to manage without async task
-    // we use a simple linear countdown in the click event for this mock phase.
+    statusLabel->setText("WARNING: Destructive operations ahead!\nUpdate starts in " + std::to_string(countdownValue.load()) + " seconds...");
 
-    statusLabel->setText("WARNING: Destructive operations ahead!\nUpdate starts in 5 seconds...");
-    startUpdate();
+    brls::async([this]() {
+        for (int i = 5; i > 0; --i) {
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+
+            brls::sync([this]() {
+                if (currentState != State::Countdown) return;
+
+                countdownValue--;
+                if (countdownValue.load() > 0) {
+                    statusLabel->setText("WARNING: Destructive operations ahead!\nUpdate starts in " + std::to_string(countdownValue.load()) + " seconds...");
+                } else {
+                    startUpdate();
+                }
+            });
+        }
+    });
 }
 
 void UpdateTab::startUpdate() {
-    statusLabel->setText("Downloading update...");
+    currentState = State::Finished;
 
-    UpdateManager::getInstance().downloadRelease(currentRelease.downloadUrl);
+    brls::async([this]() {
+        brls::sync([this]() {
+            statusLabel->setText("Downloading update...");
+        });
 
-    statusLabel->setText("Extracting update...");
+        UpdateManager::getInstance().downloadRelease(currentRelease.downloadUrl);
 
-    UpdateManager::getInstance().extractAndApplyUpdate("release.zip");
+        brls::sync([this]() {
+            statusLabel->setText("Extracting update...");
+        });
 
-    statusLabel->setText("Update finished! Please restart the app.");
-    checkButton->setTitle("Exit");
-    checkButton->setState(brls::ViewState::DEFAULT);
-    checkButton->getClickEvent()->unsubscribeAll();
-    checkButton->getClickEvent()->subscribe([](brls::View* view) {
-        brls::Application::quit();
+        UpdateManager::getInstance().extractAndApplyUpdate("release.zip");
+
+        brls::sync([this]() {
+            statusLabel->setText("Update finished! Please restart the app.");
+            actionButton->setTitle("Exit");
+            actionButton->setInteractable(true);
+        });
     });
 }

@@ -1,6 +1,7 @@
 #pragma once
 #include <borealis.hpp>
 #include "UpdateManager.hpp"
+#include <atomic>
 
 class UpdateTab : public brls::Box {
 public:
@@ -10,9 +11,18 @@ private:
     void onCheckUpdates();
     void showCountdown();
     void startUpdate();
+    void updateButtonAction();
 
     brls::Label* statusLabel;
-    brls::Button* checkButton;
+    brls::Button* actionButton;
     ReleaseInfo currentRelease;
-    int countdownTimer = 5;
+    std::atomic<int> countdownValue{5};
+
+    enum class State {
+        Idle,
+        UpdateAvailable,
+        Countdown,
+        Finished
+    };
+    State currentState = State::Idle;
 };
