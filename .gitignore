@@ -1,0 +1,5 @@
+build/
+bin/
+install_act.sh
+install-devkitpro-ubuntu.sh
+test.cpp
