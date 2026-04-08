@@ -1,0 +1,16 @@
+<brls:BoxLayout
+    width="auto"
+    height="auto"
+    flexDirection="column"
+    alignItems="center"
+    justifyContent="center">
+
+    <brls:Label
+        text="NX Updater Main Menu"
+        marginBottom="20"/>
+
+    <brls:Button
+        id="btnGoToUpdate"
+        text="Go to Updater"/>
+
+</brls:BoxLayout>

@@ -1,0 +1,38 @@
+name: Build NRO
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: ghcr.io/devkitpro/devkita64:latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: |
+        dkp-pacman -Syu --noconfirm
+        dkp-pacman -S switch-borealis --noconfirm
+
+    - name: Configure CMake
+      run: |
+        mkdir build
+        cd build
+        cmake .. -DCMAKE_TOOLCHAIN_FILE=/opt/devkitpro/cmake/Switch.cmake
+
+    - name: Build
+      run: |
+        cd build
+        make
+
+    - name: Upload NRO
+      uses: actions/upload-artifact@v4
+      with:
+        name: nx-update.nro
+        path: build/nx-updater.nro

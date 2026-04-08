@@ -1,0 +1,22 @@
+<brls:BoxLayout
+    width="auto"
+    height="auto"
+    flexDirection="column"
+    alignItems="center"
+    justifyContent="center">
+
+    <brls:Label
+        id="lblStatus"
+        text="Welcome to NX Updater"
+        marginBottom="20"/>
+
+    <brls:Button
+        id="btnCheckUpdate"
+        text="Check for Updates"
+        marginBottom="10"/>
+
+    <brls:Button
+        id="btnRewrite"
+        text="Install Update (Rewrite All)"/>
+
+</brls:BoxLayout>
