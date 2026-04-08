@@ -18,11 +18,12 @@ jobs:
     - name: Set up dependencies
       run: |
         dkp-pacman -Syu --noconfirm
-        dkp-pacman -S --noconfirm switch-cmake switch-pkg-config switch-libdrm switch-glad switch-glm switch-mbedtls switch-curl switch-bzip2 switch-libpng switch-libjpeg-turbo switch-libwebp switch-zlib switch-freetype switch-sdl2 switch-sdl2_ttf switch-sdl2_image switch-sdl2_gfx switch-sdl2_mixer switch-mesa switch-libopus switch-libvorbis switch-libogg
+        dkp-pacman -S --noconfirm switch-cmake switch-pkg-config switch-glad switch-glm switch-mbedtls switch-curl switch-bzip2 switch-libpng switch-libjpeg-turbo switch-libwebp switch-zlib switch-freetype switch-sdl2 switch-sdl2_ttf switch-sdl2_image switch-sdl2_gfx switch-sdl2_mixer switch-mesa switch-libopus switch-libvorbis switch-libogg
 
     - name: Configure CMake
       run: |
         source /etc/profile.d/devkit-env.sh
+        # switch-cmake sets up the toolchain automatically
         cmake -B build -S . -DCMAKE_TOOLCHAIN_FILE=/opt/devkitpro/cmake/Switch.cmake -DCMAKE_BUILD_TYPE=Release
 
     - name: Build

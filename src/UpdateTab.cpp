@@ -1,4 +1,3 @@
-#include <chrono>
 #include "UpdateTab.hpp"
 #include "ConfigManager.hpp"
 #include "UpdateManager.hpp"

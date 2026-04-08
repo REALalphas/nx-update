@@ -7,7 +7,6 @@ int main(int argc, char* argv[]) {
     // Init libnx
     socketInitializeDefault();
     nxlinkStdio();
-    romfsInit();
 
     // Init Borealis Logger
     brls::Logger::setLogLevel(brls::LogLevel::DEBUG);
@@ -15,8 +14,6 @@ int main(int argc, char* argv[]) {
     // Init Borealis
     if (!brls::Application::init()) {
         brls::Logger::error("Unable to init Borealis application");
-        romfsExit();
-        socketExit();
         return EXIT_FAILURE;
     }
 
@@ -37,7 +34,6 @@ int main(int argc, char* argv[]) {
     }
 
     // Exit
-    romfsExit();
     socketExit();
     return EXIT_SUCCESS;
 }
