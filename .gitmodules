@@ -1,6 +1,4 @@
 [submodule "external/borealis"]
 	path = external/borealis
 	url = https://github.com/XITRIX/borealis.git
-[submodule "external/json"]
-	path = external/json
 	url = https://github.com/nlohmann/json.git

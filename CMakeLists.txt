@@ -32,15 +32,15 @@ FetchContent_MakeAvailable(json)
 set(BOREALIS_LIBRARY ${CMAKE_CURRENT_SOURCE_DIR}/external/borealis/library)
 set(BOREALIS_PATH ${BOREALIS_LIBRARY})
 
-# Borealis variables to prevent errors
+# Fake DBus to satisfy Borealis without triggering its FindDBus logic errors
+set(DBUS_FOUND TRUE CACHE BOOL "Fake DBus" FORCE)
+set(DBUS_LIBRARIES "dbus-1" CACHE STRING "" FORCE)
+set(DBUS_INCLUDE_DIR "/usr/include" CACHE STRING "" FORCE)
+set(DBUS_ARCH_INCLUDE_DIR "/usr/include" CACHE STRING "" FORCE)
+set(DBUS_INCLUDE_DIRS "/usr/include" CACHE STRING "" FORCE)
+
 set(BRLS_UNITY_BUILD OFF CACHE BOOL "Disable unity build")
 set(SDL_DBUS OFF CACHE BOOL "Disable SDL DBUS")
-
-# Mock DBus variables to prevent NOTFOUND errors in devkitPro container
-set(DBUS_INCLUDE_DIRS "" CACHE STRING "" FORCE)
-set(DBUS_LIBRARIES "" CACHE STRING "" FORCE)
-set(DBUS_INCLUDE_DIR "" CACHE STRING "" FORCE)
-set(DBUS_ARCH_INCLUDE_DIR "" CACHE STRING "" FORCE)
 
 # Add Borealis library
 add_subdirectory(external/borealis/library)
