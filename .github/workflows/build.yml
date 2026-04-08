@@ -22,13 +22,13 @@ jobs:
 
     - name: Configure CMake
       run: |
-        source /etc/profile.d/devkit-env.sh
+        . /etc/profile.d/devkit-env.sh
         # switch-cmake sets up the toolchain automatically
-        cmake -B build -S . -DCMAKE_TOOLCHAIN_FILE=/opt/devkitpro/cmake/Switch.cmake -DCMAKE_BUILD_TYPE=Release
+        aarch64-none-elf-cmake -B build -S . -DCMAKE_TOOLCHAIN_FILE=/opt/devkitpro/cmake/Switch.cmake -DCMAKE_BUILD_TYPE=Release
 
     - name: Build
       run: |
-        source /etc/profile.d/devkit-env.sh
+        . /etc/profile.d/devkit-env.sh
         cmake --build build -j$(nproc)
 
     - name: Upload Artifact
